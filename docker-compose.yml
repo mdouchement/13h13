@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  13h13:
+    restart: always
+    image: mdouchement/13h13
+    hostname: '13h13'
+    container_name: '13h13'
+    ports:
+      - '8080:8080'
+      - '127.0.0.1:8081:8081'
+    links:
+      - my_webapp:my_webapp
+    environment:
+      - THIRTEEN_PROXY_ADDRESS=:8080
+      - THIRTEEN_METRICS_ADDRESS=:8081
+      - THIRTEEN_SERVICE=my_app
+      - THIRTEEN_FORWARD_TO=http://my_webapp:8080
+
+  # example
+  my_webapp:
+    restart: always
+    image: my-webapp-image
+    hostname: my_webapp
+    container_name: my_webapp
