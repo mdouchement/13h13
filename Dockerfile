@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.11-alpine as build-env
+FROM golang:1-alpine as build-env
 MAINTAINER mdouchement
 
 RUN apk upgrade
@@ -15,10 +15,13 @@ RUN dep ensure -v
 RUN go build -o thirteen thirteen.go
 
 # final stage
-FROM alpine:3.8
+FROM alpine
 MAINTAINER mdouchement
 
 COPY --from=build-env /go/src/github.com/mdouchement/13h13/thirteen /usr/local/bin/
+
+RUN chown nobody:nogroup /usr/local/bin/thirteen
+USER nobody
 
 EXPOSE 8080
 CMD ["thirteen"]
