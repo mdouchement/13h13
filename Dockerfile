@@ -1,27 +1,23 @@
 # build stage
-FROM golang:1-alpine as build-env
+FROM golang:alpine as build-env
 MAINTAINER mdouchement
 
 RUN apk upgrade
-RUN apk add --update --no-cache git curl
 
-RUN mkdir -p /go/src/github.com/mdouchement/13h13
-WORKDIR /go/src/github.com/mdouchement/13h13
+ENV CGO_ENABLED 0
+ENV GO111MODULE on
 
-COPY . /go/src/github.com/mdouchement/13h13/
+WORKDIR /13h13
+COPY . .
 
-RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-RUN dep ensure -v
-RUN go build -o thirteen thirteen.go
+RUN go mod download
+RUN go build -ldflags "-s -w" -o thirteen .
 
 # final stage
-FROM alpine
+FROM scratch
 MAINTAINER mdouchement
 
-COPY --from=build-env /go/src/github.com/mdouchement/13h13/thirteen /usr/local/bin/
-
-RUN chown nobody:nogroup /usr/local/bin/thirteen
-USER nobody
+COPY --from=build-env /13h13/thirteen /usr/local/bin/
 
 EXPOSE 8080
 CMD ["thirteen"]
