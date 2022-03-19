@@ -1,8 +1,9 @@
 # build stage
 FROM golang:alpine as build-env
-MAINTAINER mdouchement
+LABEL maintainer="mdouchement"
 
 RUN apk upgrade
+RUN apk add --update --no-cache git curl
 
 ENV CGO_ENABLED 0
 ENV GO111MODULE on
@@ -15,7 +16,7 @@ RUN go build -ldflags "-s -w" -o thirteen .
 
 # final stage
 FROM scratch
-MAINTAINER mdouchement
+LABEL maintainer="mdouchement"
 
 COPY --from=build-env /13h13/thirteen /usr/local/bin/
 
